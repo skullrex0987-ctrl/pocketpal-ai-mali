@@ -327,3 +327,4 @@ Made with ❤️ for people who want AI that stays on their phone.
 <sub>If PocketPal is useful to you, consider giving it a ⭐ — it helps others find the project.</sub>
 
 </div>
+# Mali GPU Build
