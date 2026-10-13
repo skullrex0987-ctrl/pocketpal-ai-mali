@@ -32,9 +32,11 @@ jobs:
         run: echo "ORG_GRADLE_PROJECT_rnllamaVariants=$(node scripts/verify-android-payload.js --print-variants)" >> "$GITHUB_ENV"
       - name: Build APK
         working-directory: android
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+          ORG_GRADLE_OPTS: '-Xmx8g -XX:MaxMetaspaceSize=4g'
         run: |
           chmod +x gradlew
-          export NODE_OPTIONS="--max-old-space-size=8192"
           ./gradlew assembleProdRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
       - name: Publish APK as pre-release
         env:
