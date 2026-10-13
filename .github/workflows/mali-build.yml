@@ -4,12 +4,13 @@ permissions:
   contents: write
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
       ORG_GRADLE_PROJECT_rnllamaBuildFromSource: 'true'
       RNLLAMA_SKIP_POSTINSTALL: '1'
-      NODE_OPTIONS: '--max-old-space-size=4096'
+      NODE_OPTIONS: '--max-old-space-size=8192'
+      ORG_GRADLE_PROJECT_ORG_GRADLE_OPTS: '-Xmx8g'
     steps:
       - uses: actions/checkout@v4
       - name: Free disk space
@@ -33,6 +34,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
+          export NODE_OPTIONS="--max-old-space-size=8192"
           ./gradlew assembleProdRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
       - name: Publish APK as pre-release
         env:
