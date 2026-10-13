@@ -41,3 +41,4 @@ jobs:
             android/app/build/outputs/apk/prod/release/app-prod-release.apk \
             --prerelease --title "Mali test ${{ github.run_number }}" \
             --notes "Experimental Mali GPU build"
+
