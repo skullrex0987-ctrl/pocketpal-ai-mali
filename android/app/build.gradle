@@ -167,7 +167,7 @@ android {
     productFlavors {
         prod {
             dimension "distribution"
-            // applicationId stays as defaultConfig: com.pocketpalai
+            applicationIdSuffix ".mali"
         }
         e2e {
             dimension "distribution"

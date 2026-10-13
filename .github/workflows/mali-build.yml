@@ -1,0 +1,43 @@
+name: mali-build
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      ORG_GRADLE_PROJECT_rnllamaBuildFromSource: 'true'
+      RNLLAMA_SKIP_POSTINSTALL: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.21.0'
+          cache: 'yarn'
+      - run: yarn install
+      - name: Apply Mali patch
+        run: python3 mali_patch.py
+      - name: Create .env
+        run: cp .env.example .env
+      - name: Choose native variants
+        run: echo "ORG_GRADLE_PROJECT_rnllamaVariants=$(node scripts/verify-android-payload.js --print-variants)" >> "$GITHUB_ENV"
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleProdRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+      - name: Publish APK as pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "mali-test-${{ github.run_number }}" \
+            android/app/build/outputs/apk/prod/release/app-prod-release.apk \
+            --prerelease --title "Mali test ${{ github.run_number }}" \
+            --notes "Experimental Mali GPU build"
